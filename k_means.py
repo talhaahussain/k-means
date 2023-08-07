@@ -22,6 +22,15 @@ def get_labels(data, centroids):
     distances = centroids.apply(lambda x: np.sqrt(((data - x) ** 2).sum(axis=1)))
     return distances.idxmin(axis=1)
 
+def update_centroids(data, labels):
+    return data.groupby(labels).apply(lambda x: np.exp(np.log(x).mean())).T # Splits dataframe by cluster, finds geometric mean of each feature
+
+
 data = initialise_data(file, features)
 centroids = initialise_centroids(data, 5)
 labels = get_labels(data, centroids)
+print(centroids)
+for i in range(10):
+    centroids = update_centroids(data, labels)
+    labels = get_labels(data, centroids)
+    print(centroids)
