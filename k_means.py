@@ -18,5 +18,10 @@ def initialise_centroids(data, k):
         centroids.append(centroid)
     return pd.concat(centroids, axis=1)
 
+def get_labels(data, centroids):
+    distances = centroids.apply(lambda x: np.sqrt(((data - x) ** 2).sum(axis=1)))
+    return distances.idxmin(axis=1)
+
 data = initialise_data(file, features)
 centroids = initialise_centroids(data, 5)
+labels = get_labels(data, centroids)
