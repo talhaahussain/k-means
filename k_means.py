@@ -44,7 +44,7 @@ def main():
     data = initialise_data(file, features)
 
     max_iters = 100
-    k = 10
+    k = 3
 
     centroids = initialise_centroids(data, k)
     old_centroids = pd.DataFrame()
@@ -57,5 +57,8 @@ def main():
         plot_clusters(data, labels, centroids, iteration)
         iteration += 1
 
+    return centroids
+
 if __name__ == "__main__":
-    main()
+    centroids = main()
+    print(centroids)
