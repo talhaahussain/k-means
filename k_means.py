@@ -1,5 +1,8 @@
 import pandas as pd
 import numpy as np
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+from IPython.display import clear_output
 
 file = "all_seasons.csv"
 features = ["player_height", "player_weight", "draft_year", "draft_round", "draft_number"]
@@ -25,12 +28,34 @@ def get_labels(data, centroids):
 def update_centroids(data, labels):
     return data.groupby(labels).apply(lambda x: np.exp(np.log(x).mean())).T # Splits dataframe by cluster, finds geometric mean of each feature
 
+def plot_clusters(data, labels, centroids, iteration):
+    pca = PCA(n_components=2)
+    data_2d = pca.fit_transform(data)
+    centroids_2d = pca.transform(centroids.T)
+    clear_output(wait=True)
+    plt.title(f'Iteration {iteration}')
+    plt.scatter(x=data_2d[:,0], y=data_2d[:,1], c=labels)
+    plt.scatter(x=centroids_2d[:,0], y=centroids_2d[:,1])
+    plt.show()
 
-data = initialise_data(file, features)
-centroids = initialise_centroids(data, 5)
-labels = get_labels(data, centroids)
-print(centroids)
-for i in range(10):
-    centroids = update_centroids(data, labels)
-    labels = get_labels(data, centroids)
-    print(centroids)
+def main():
+    file = "all_seasons.csv"
+    features = ["player_height", "player_weight", "draft_year", "draft_round", "draft_number"]
+    data = initialise_data(file, features)
+
+    max_iters = 100
+    k = 10
+
+    centroids = initialise_centroids(data, k)
+    old_centroids = pd.DataFrame()
+    iteration = 1
+
+    while iteration < max_iters and not centroids.equals(old_centroids):
+        old_centroids = centroids
+        labels = get_labels(data, centroids)
+        centroids = update_centroids(data, labels)
+        plot_clusters(data, labels, centroids, iteration)
+        iteration += 1
+
+if __name__ == "__main__":
+    main()
